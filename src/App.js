@@ -3,9 +3,13 @@ import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
 import Footer from './components/Footer'
+import LoginForm from './components/LoginForm'
+import Togglable from './components/Togglable'
+import BlogForm from './components/BlogForm'
 
 import blogService from './services/blogs'
 import loginService from './services/login'
+
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
@@ -17,6 +21,8 @@ const App = () => {
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+  
+  const [loginVisible, setLoginVisible] = useState(false)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -47,7 +53,6 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (error) {
-      console.log(error);
       setErrorMessage(error.response.data.error)
       setTimeout(() => {
         setErrorMessage(null)
@@ -67,7 +72,8 @@ const App = () => {
     const blogObject = {
       title: title,
       author: author,
-      url: url
+      url: url,
+      user: user
     }
     blogService.setToken(user.token)
     const returnedBlog = await blogService.create(blogObject)
@@ -80,7 +86,6 @@ const App = () => {
     setAuthor('')
     setUrl('')
     } catch (error) {
-      console.log('ERrpprpkeroprkero',error);
       setErrorMessage(error.response.data.error)
       setTimeout(() => {
         setErrorMessage(null)
@@ -89,6 +94,7 @@ const App = () => {
       
   }
 
+ 
   
 
   // const toggleImportanceOf = id => {
@@ -115,72 +121,26 @@ const App = () => {
   // ? blogs
   // : blogs.filter(blog => blog.important)
 
-  const loginForm = () => (
-    <form onSubmit={handleLogin}>
-      <div>
-        username
-          <input
-          type="text"
-          value={username}
-          name="Username"
-          onChange={({ target }) => setUsername(target.value)}
-        />
-      </div>
-      <div>
-        password
-          <input
-          type="password"
-          value={password}
-          name="Password"
-          onChange={({ target }) => setPassword(target.value)}
-        />
-      </div>
-      <button type="submit">login</button>
-    </form>      
-  )
+  
 
-  const blogForm = () => (
-    <form onSubmit={addBlog}>
-      <div>
-        title:
-          <input
-          type="text"
-          value={title}
-          name="title"
-          onChange={({ target }) => setTitle(target.value)}
-        />
-      </div>
-      <div>
-        author:
-          <input
-          type="text"
-          value={author}
-          name="author"
-          onChange={({ target }) => setAuthor(target.value)}
-        />
-      </div>
-      <div>
-        url:
-          <input
-          type="text"
-          value={url}
-          name="url"
-          onChange={({ target }) => setUrl(target.value)}
-        />
-      </div>
-      <button type="submit">create</button>
-    </form>  
-  )
+  const sortedBlogs = blogs.sort((a,b) => b.likes - a.likes)
+
  
-  if (user === null) {
+  if (user === null) 
     return (
       <div>
         <h2>Log in to application</h2>
         {errorMessage &&<Notification message={errorMessage} />}
-        {loginForm()}
+        <Togglable buttonLabel='login'>
+          <LoginForm 
+            handleLogin={handleLogin}
+            username={username}
+            setUsername={setUsername} 
+            password={password} 
+            setPassword={setPassword} />
+        </Togglable>
       </div>
-    )
-  }
+  )
 
   return (
     <div>
@@ -189,11 +149,26 @@ const App = () => {
       <div>
         {user.name} logged in <button onClick={handleLogout}>log out</button>
       </div>
-      <h2>Add new blog:</h2>
-      {blogForm()}
+      <Togglable buttonLabel="new note">
+        <BlogForm
+          addBlog={addBlog}
+          title={title}
+          setTitle={setTitle}
+          author={author}
+          setAuthor={setAuthor}
+          url={url}
+          setUrl={setUrl}
+        />
+      </Togglable>
       <h2>Blogs</h2>
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+      {sortedBlogs.map(blog =>
+        <Blog 
+          key={blog.id} 
+          blog={blog} 
+          setBlogs={setBlogs} 
+          blogs={blogs} 
+          setErrorMessage={setErrorMessage}
+          user={user}/>
       )}
     </div>
   )
