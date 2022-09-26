@@ -3,8 +3,8 @@ import { useState } from 'react'
 import blogService from '../services/blogs'
 
 const Blog = ({ blog, setBlogs, blogs, setErrorMessage, user }) => {
-  const label = blog.important
-    ? 'make not important' : 'make important'
+  // const label = blog.important
+  //   ? 'make not important' : 'make important'
 
   const blogStyle = {
     display: 'flex',
@@ -38,13 +38,11 @@ const Blog = ({ blog, setBlogs, blogs, setErrorMessage, user }) => {
         url: blog.url
       }
       await blogService.update(blog.id, blogToUpdate)
-      
       setErrorMessage(`new like for ${blog.title} added`)
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
       setLikes(likes+1)
-      
     } catch (error){
       setErrorMessage(error.response.data.error)
       setTimeout(() => {
@@ -71,8 +69,6 @@ const Blog = ({ blog, setBlogs, blogs, setErrorMessage, user }) => {
         }, 5000)
       }
     }
-    
-    
   }
 
 
