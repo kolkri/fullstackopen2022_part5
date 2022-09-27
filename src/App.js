@@ -89,6 +89,9 @@ const App = () => {
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
+      blogService.getAll().then(blogs =>
+        setBlogs( blogs )
+      )
     } catch (error) {
       setErrorMessage(error.response.data.error)
       setTimeout(() => {
@@ -96,34 +99,6 @@ const App = () => {
       }, 5000)
     }
   }
-
-  // const toggleImportanceOf = id => {
-  //   const blog = blogs.find(b => b.id === id)
-  //   const changedBlog = { ...blog, important: !blog.important }
-
-  //   blogService
-  //     .update(id, changedBlog)
-  //     .then(returnedBlog => {
-  //       setBlogs(blogs.map(blog => blog.id !== id ? blog : returnedBlog))
-  //     })
-  //     .catch(error => {
-  //       setErrorMessage(
-  //         `Blog '${blog.title}' was already removed from server`
-  //       )
-  //       setTimeout(() => {
-  //         setErrorMessage(null)
-  //       }, 5000)
-  //       setBlogs(blogs.filter(b => b.id !== id))
-  //     })
-  // }
-
-  // const blogsToShow = showAll
-  // ? blogs
-  // : blogs.filter(blog => blog.important)
-
-
-
-  const sortedBlogs = blogs.sort((a,b) => b.likes - a.likes)
 
 
   if (user === null)
@@ -147,15 +122,15 @@ const App = () => {
       <h2>Welcome</h2>
       {errorMessage &&<Notification message={errorMessage} />}
       <div>
-        {user.name} logged in <button onClick={handleLogout}>log out</button>
+        {user.name} logged in <button id="logout-button" onClick={handleLogout}>log out</button>
       </div>
-      <Togglable buttonLabel="new note">
+      <Togglable buttonLabel="new blog">
         <BlogForm
           createBlog={createBlog}
         />
       </Togglable>
       <h2>Blogs</h2>
-      {sortedBlogs.map(blog =>
+      {blogs.sort((a,b) => b.likes - a.likes).map(blog =>
         <Blog
           key={blog.id}
           blog={blog}

@@ -73,15 +73,15 @@ const Blog = ({ blog, setBlogs, blogs, setErrorMessage, user, likeCallback }) =>
   return (
     <div>
       <div style={hideWhenVisible} className='blog'>
-        {blog.title}&nbsp;{blog.author} <button onClick={toggleShowingDetails}>view</button>
+        <span>{blog.title}by {blog.author}</span> <button id="view" onClick={toggleShowingDetails}>view</button>
       </div>
       <div style={showWhenVisible} className='all-visible'>
         <div>{blog.title} <button onClick={toggleShowingDetails}>hide</button></div>
         <div>{blog.url}</div>
-        <div>likes {likes} <button onClick={() => addLike(blog)}>like</button></div>
+        <div>likes: {likes} <button id="like" onClick={() => addLike(blog)}>like</button></div>
         <div>{blog.user.name}</div>
         {blog.user.name === user.name &&
-        <button onClick={() => removeBlog(blog)}style={removeButton}>remove</button>}
+        <button id="remove" onClick={() => removeBlog(blog)}style={removeButton}>remove</button>}
       </div>
     </div>
   )
