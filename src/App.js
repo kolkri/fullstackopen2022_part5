@@ -17,9 +17,6 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -65,28 +62,33 @@ const App = () => {
     setUser(null)
   }
 
-  const addBlog = async (event) => {
-    event.preventDefault()
+  const createBlog = async (blogObject) => {
     try {
-      const blogObject = {
-        title: title,
-        author: author,
-        url: url,
-        user: user
-      }
       blogService.setToken(user.token)
       const returnedBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(returnedBlog))
-      setErrorMessage(`a new blog ${title} by ${author} added`)
+      setErrorMessage(`a new blog ${blogObject.title} by ${blogObject.author} added`)
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)
       blogService.getAll().then(blogs =>
         setBlogs( blogs )
       )
-      setTitle('')
-      setAuthor('')
-      setUrl('')
+    } catch (error) {
+      setErrorMessage(error.response.data.error)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
+
+  const like = async (id, blog) => {
+    try{
+      await blogService.update(id, blog)
+      setErrorMessage(`new like for ${blog.title} added`)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
     } catch (error) {
       setErrorMessage(error.response.data.error)
       setTimeout(() => {
@@ -149,13 +151,7 @@ const App = () => {
       </div>
       <Togglable buttonLabel="new note">
         <BlogForm
-          addBlog={addBlog}
-          title={title}
-          setTitle={setTitle}
-          author={author}
-          setAuthor={setAuthor}
-          url={url}
-          setUrl={setUrl}
+          createBlog={createBlog}
         />
       </Togglable>
       <h2>Blogs</h2>
@@ -166,7 +162,8 @@ const App = () => {
           setBlogs={setBlogs}
           blogs={blogs}
           setErrorMessage={setErrorMessage}
-          user={user}/>
+          user={user}
+          likeCallback={like}/>
       )}
     </div>
   )
